@@ -2,7 +2,7 @@
 
 https://github.com/user-attachments/assets/ba946da6-dd57-4218-beab-d461410176ed
 
-````md
+
 # 🚀 TeleOps AI Agent
 
 An AI-powered telecom operations assistant built using **LangGraph**, **RAG**, **FastAPI**, and **React**.
