@@ -1,0 +1,154 @@
+Multivendor agentic AI solution for cloud RAN
+Multivendor telecom troubleshooting is complex, requiring coordination across RAN, cloud platforms, and hardware layers.
+Read about our demo that shows how agentic AI orchestration across Ericsson, Red Hat, and Intel enables automated diagnostics and faster root cause analysis.
+As telecommunications (telco) networks evolve into cloud-native, multivendor environments, troubleshooting has become increasingly complex. A single alarm may stem from issues spanning multiple domains, such as RAN software, cloud platform layers, and underlying hardware.
+
+Currently, traditional workflows require manual triage across teams, tools, and vendors, increasing Mean Time to Resolution (MTTR) and operational friction.
+
+To address these challenges, we developed a demo showcasing multi-vendor agentic AI orchestration that enables coordinated, multivendor diagnostics across the full stack, from Ericsson RAN software to Red Hat OpenShift platforms to Intel hardware infrastructure.
+
+System architecture: Orchestrated intelligence across vendor domains
+The demo solution is built around an agent-orchestrator model to unify multivendor diagnostics. Ericsson developed the central orchestration and RAN domain agent; Red Hat provided platform-level intelligence and Intel delivered hardware diagnostics, both exposed through their domain agents via MCP servers.
+
+Note that the agent orchestrator model can be replaced with any agent/model that has orchestration and reasoning capabilities, supported by a knowledge base containing network troubleshooting playbooks.
+
+Each vendor exposes expertise through MCP, which acts as a standardized interface allowing agents to collaborate without exposing internal systems, data structures, or proprietary logic.
+
+From an architectural perspective, this creates a clean separation of concerns:
+
+The orchestrator handles reasoning, planning, and workflow execution.
+Domain agents provide specialized diagnostics.
+MCP provides security-focused, tool-level interoperability.
+This model allows multivendor cooperation while maintaining data isolation and security boundaries.
+
+Orchestrator agent + RAN intelligence agent
+For this demo solution, Ericsson designed and implemented the orchestration layer using the ELIA agentic framework (Ericsson Learning Intelligent Agents), which combines LLM-driven reasoning, structured NOC troubleshooting playbooks, alarm correlation logic, and cross-domain investigation planning.
+
+When a network issue is detected, the orchestrator interprets alarms, PM counters, and system signals from the Ericsson RAN domain. It then generates an investigation plan using encoded operational playbooks and decides which domain expert agent to engage.
+
+Once it knows which vendors to engage, it coordinates tool execution across vendor agents. Finally, it builds an evidence chain toward the root cause.
+
+The first line of defense in this ecosystem is the RAN agent itself.
+
+""A workflow diagram illustrating how an LLM-based orchestrator triggers specialized AI agents. The process begins with a network alarm. The orchestrator, using an LLM and tool invocation, interprets the alarm, creates a troubleshooting plan, and selectively invokes domain-specific agents (RAN, platform, and hardware). Each domain agent is also equipped with an LLM and domain-specific tools, allowing it to analyze relevant data and return structured diagnostic results. The orchestrator then aggregates these results, correlates findings across domains, and produces a final diagnosis with recommended actions.
+Fig 2: LLM orchestrator triggers specialized AI agents (drawing by Sheyda Kiani Mehr)
+
+Ericsson RAN agent
+Ericsson's RAN domain agent is an intelligent, autonomous system that performs comprehensive network troubleshooting by analyzing multiple data sources simultaneously.
+
+The agent uses a sophisticated multiphase workflow combining alarm analysis, performance monitoring, configuration verification, and AI-powered correlation to identify root causes and generate actionable solutions.
+
+This helps ensure that issues contained entirely within the RAN layer can be diagnosed without involving other vendors.
+
+Core capabilities
+
+The agent performs 4 primary functions: 
+
+Alarm analysis within Fault Management (FM): correlates alarms and identifies patterns.  
+Performance Counter Anomaly Detection (PM): analyzes metrics and detects deviations.
+Configuration Verification (CM): identifies drift and misconfigurations.
+Multisource correlation: determines root cause across FM, PM, and CM.
+Note that access to specific data sources is configurable and dependent on network operator-approved exposure.
+
+Using statistical anomaly detection, knowledge-base integration, and LLM-powered insights, the agent produces prioritized recommendations, executive summaries, and technical reports that help engineers resolve issues faster, reduce manual investigation time, and improve overall network reliability through automated, evidence-driven diagnosis.
+
+Tool ecosystem
+
+The agent takes advantage of specialized tools organized into 5 categories:
+
+Core workflow tools: manage troubleshooting lifecycle and execution.
+Data collection tools: gather metrics and configuration data.
+Performance tools: enable metric discovery and analysis.
+Alarm tools: filter and analyze fault data.
+Knowledge base tools (RAG): provide contextual insights.
+However, troubleshooting doesn't stop at the application layer. When the RAN agent identifies potential issues rooted in the cloud environment, such as container orchestration errors or operating system (OS)-level latency, the orchestrator invokes the Red Hat domain agent via MCP to investigate the platform layer.
+
+Multivendor integration via MCP
+Red Hat agent
+The MCP server from Red Hat exposes 2 key capabilities to the multivendor agent system:
+
+Ask Red Hat agent service: A conversational interface for the Red Hat knowledge base, providing access to documentation, solution articles, and product guidance for Red Hat OpenShift, Red Hat Enterprise Linux, and related technologies.
+Agentic search case history: A search tool that finds similar past issues and their resolutions, providing institutional memory that helps answer "Has anyone seen this before?"
+Red Hat supports end-to-end security with a multilayered, defense-in-depth model. This includes:
+
+Mutual TLS (mTLS) with a full PKI certificate chain that only authorized agents can connect.
+OAuth2 client credentials that authenticate API access through Red Hat SSO.
+IP allowlisting that restricts network access to authorized partners.
+Encrypted VPN tunnels protecting traffic in transit.
+""A multiagent orchestration architecture diagram illustrating platform- and hardware-level troubleshooting using Red Hat and Intel agents. The orchestrator communicates with both agents through MCP servers, which act as secure gateways. Through these interfaces, the orchestrator invokes troubleshooting tools such as knowledge base queries, case history search, and hardware diagnostics.
+Fig 3: Multiagent orchestration architecture (source: RedHat)
+
+The MCP server acts as a black box, allowing the orchestrator to invoke troubleshooting tools and receive results without visibility into how Red Hat’s knowledge base is structured or which internal APIs are used.
+
+For example, in a PTP timing fault scenario, the orchestrator may delegate platform-level analysis to the Red Hat agent via MCP. Once engaged, the agent analyzes PTP operator logs and cloud event proxy data. In one demonstrated use case, Red Hat’s analysis confirmed a platform-side timing disturbance – master offset spikes and lock-state flips – providing the evidence needed to narrow the investigation.
+
+In another case, the agent identified the actual root cause: a misconfigured fw-lldp-agent parameter interfering with PTP traffic. Although the initial symptoms appeared similar, the underlying causes were different – demonstrating precise, evidence-based diagnosis.
+
+Intel agent
+The Intel agents perform reasoning over live system data, retrieve relevant knowledge from support artifacts, and respond with root cause and actionable insights as issues occur. To support the demanding performance and reliability requirements of real-time agent orchestration within the telco support framework, the Intel agent is built on an enterprise-grade hardware and software stack to deliver efficient AI inference, data retrieval, and observability across multivendor environments.
+
+Intel® Xeon® 6 with Intel® Advanced Matrix Extensions (AMX)
+
+The Intel agent takes advantage of Intel Xeon 6 processors as its core hardware platform. This CPU-first architecture, built for modern AI workloads, uses 2 standout features: Intel Advanced Matrix Extensions (AMX) for accelerated processing and high-bandwidth MRDIMMs for superior memory throughput.
+
+Intel's AMX technology delivers built-in AI acceleration directly on the processor core, dramatically speeding up matrix operations without requiring separate accelerator hardware. By supporting optimized data formats like Bfloat16 (BF16) and INT8, AMX achieves substantial performance gains while preserving the accuracy of traditional FP32 computations. These enhancements are integrated into popular AI frameworks, including PyTorch, and are natively supported by leading LLM deployment platforms such as vLLM and SGlang.
+
+Software architecture
+
+The Intel agent's software foundation centers on Intel AI for Enterprise Inference and Enterprise RAG, which together provide the core backend services for real-time telco support operations. Enterprise Inference enables real-time reasoning for interactive troubleshooting, ticket analysis, and diagnostics, using Kubernetes for automated scaling and high availability. The platform integrates vLLM and SGLang engines for high-throughput, memory-efficient serving of conversational and agentic workloads.
+
+Enterprise RAG provides end-to-end, retrieval-augmented generation, allowing the agent to ingest knowledge bases, support tickets, and documentation for real-time vector search and response generation. Designed for low-latency retrieval and high concurrency, it delivers accurate, context-aware answers during live support interactions.
+
+To operationalize these capabilities, MCP extends the foundation by providing a standard, security-focused tooling interface into ticketing platforms, enabling the agent to retrieve case context, search historical incidents, and execute approved actions.
+
+Together, Enterprise Inference and Enterprise RAG allow the Intel agent to function as an effective backend intelligence layer within the telco agent orchestration framework. Advanced capabilities, such as structured generation, tool invocation, and scalable serving, are enabled through vLLM, SGLang, while remaining transparent to the agent consumer. This approach ensures performance, scalability, and long-term maintainability, with software optimizations closely aligned to Xeon’s AI hardware capabilities.
+
+Operational benefits of MCP in multivendor architectures
+This “plug-and-collaborate” model provides a framework that allows:
+
+the orchestrator to call vendor agents
+each vendor to return structured results
+internal knowledge and implementation to remain private
+From orchestration agent perspective, MCP enables:
+
+Security-focused delegation of platform-specific investigations to Red Hat via orchestrator-initiated MCP calls.
+Security-focused delegation of hardware-level diagnostics to Intel via orchestrator-initiated MCP calls.
+Standardized communication across vendor domains.
+The orchestrator never accesses proprietary knowledge bases directly, it only receives validated outputs from vendor agents.
+
+From Intel, the agentic AI is powered by Intel AI for Enterprise, integrating into multivendor orchestration frameworks to deliver intelligent automation and rapid issue resolution. This integration takes advantage of Enterprise Inference and eRAG capabilities to orchestrate sophisticated workflows through MCP client interactions.
+
+End-to-end demo scenarios
+To demonstrate how the orchestrator manages complex behaviors, we simulated a “cross-vendor” fault involving Precision Time Protocol (PTP) timing instability. This scenario required coordination across all 3 domains and demonstrated full-stack collaborative troubleshooting.
+
+An alarm is received by the Ericsson orchestrator, triggering cross-domain analysis.
+The Ericsson RAN domain agent identifies timing anomalies from RAN alarms and PM indicators.
+The Orchestrator engages Red Hat agent to analyze platform timing behavior.
+The Red Hat agent confirms lock-state instability and timing offset spikes.
+The Orchestrator engages Intel agent to analyze hardware timing behavior.
+The Intel agent performs NIC timestamp diagnostics.
+The Root cause traced to hardware timestamp inconsistencies.
+Why orchestration matters
+Orchestration facilitates cross-domain investigation planning, streamlining vendor handoffs, and maintaining evidence-driven root cause tracking alongside automated troubleshooting workflows.
+
+By integrating these capabilities, the system effectively eliminates common operational inefficiencies such as duplicate investigations, and missed cross-layer correlations no longer hinder performance.
+
+Operational impact for telcos
+This architecture transforms troubleshooting from reactive analysis into coordinated, AI-assisted diagnosis.
+
+Key benefits include:
+
+Reduces manual effort and handoffs via orchestrated triage and automated investigation workflows.
+Provides faster MTTR through automated, cross-domain investigations.
+Minimizes site visits by confirming root causes remotely.
+Captures knowledge through encoded playbooks.
+Ensures consistent troubleshooting quality across teams.
+Maintains clear accountability through comprehensive evidence chains.
+A shift toward intelligent field operations
+Modern telco environments provide the three ingredients required for agentic AI:
+
+Rich telemetry across RAN, cloud, and hardware layers.
+Cloud-native platforms that host AI services.
+Standardized protocols enabling multivendor cooperation.
+By combining these capabilities with orchestration-driven reasoning, we move from alert-driven operations to context-aware, evidence-based root cause analysis. This marks a shift from reactive troubleshooting to intelligent, coordinated field operations—where multiple vendor domains can collaborate safely, efficiently, and at scale.
+
